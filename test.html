@@ -11,14 +11,16 @@
 <script>
     async function fetchBikes() {
             try {
-                const response = await fetch('./manage_bikes.php', {
+                const response = await fetch('./users.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        action: 'fetchCount',
-                        account_id: "1"
+                        action: 'add',
+                        username: 'mark',
+                        email: 'markclarencemarfil@gmail.com',
+                        password: 'mark'
                     })
                 });
 
