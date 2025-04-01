@@ -6,6 +6,41 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>wow</h1>
+
 </body>
+<script>
+    async function fetchBikes() {
+            try {
+                const response = await fetch('./manage_bikes.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'fetchCount',
+                        account_id: "1"
+                    })
+                });
+
+                const responseText = await response.text();
+                
+                try {
+                    const data = JSON.parse(responseText);
+                    
+                    if (data.success) {
+                        console.log(data)
+                    } else {
+                        console.error('Server returned error:', data.error);
+                    }
+                } catch (parseError) {
+                    console.error('Failed to parse JSON response:', parseError);
+                    console.log('Raw response:', responseText);
+                }
+            } catch (fetchError) {
+                console.error('Fetch error:', fetchError);
+            }
+        }
+
+        fetchBikes();
+</script>
 </html>

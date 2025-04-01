@@ -30,7 +30,7 @@
     </div>
 
     <script>
-        const API_URL = "http://localhost/bikonomi/manage_bikes.php";  // Change this if needed
+        const API_URL = "http://localhost/bikonomiapi/manage_bikes.php";  // Change this if needed
 
         async function addBike() {
             const bikeName = document.getElementById("bikeName").value;
