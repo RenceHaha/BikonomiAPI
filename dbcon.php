@@ -1,10 +1,10 @@
 <?php
 
-    $username="root";
+    $username="marfil";
     $dbname="bikonomi";
-    $password="";
+    $password="Marfil@123";
 
-    $dbservername = "localhost";
+    $dbservername = "5.181.217.90";
     $dbusername = $username;
     $dbpassword = $password;
     $mysqldbname = $dbname;
