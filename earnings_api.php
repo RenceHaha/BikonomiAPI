@@ -9,7 +9,7 @@ function getDailyEarnings($date, $account_id) {
               FROM payment_tbl p 
               JOIN rental_tbl r ON p.rent_id = r.rent_id 
               JOIN bike_tbl b ON r.bike_id = b.bike_id 
-              JOIN rate_tbl rt ON b.rate_id = rt.rate_id
+              JOIN rate_tbl rt ON rt.rate_id = rt.rate_id
               JOIN bike_type_tbl bt ON b.bike_type_id = bt.bike_type_id 
               WHERE DATE(p.date) = ? AND b.account_id = ?";
     
