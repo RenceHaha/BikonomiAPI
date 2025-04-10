@@ -1,8 +1,8 @@
 <?php
 
-    $username="root";
+    $username="marfil";
     $dbname="bikonomi_1";
-    $password="";
+    $password="Marfil@123";
 
     $dbservername = "localhost";
     $dbusername = $username;
