@@ -27,6 +27,7 @@ function getDailyEarnings($date, $account_id) {
             'bike_id' => $row['bike_id'],
             'bike_type' => $row['bike_type_name'],
             'bike_name' => $row['bike_name'],
+            'rent_id' => $row['rent_id'],
             'image_path' => $row['image_path'],
             'rate_per_minute' => $row['rate_per_minute'],
             'start_time' => $row['start_time'],
