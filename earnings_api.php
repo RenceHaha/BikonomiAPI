@@ -5,7 +5,7 @@ include 'dbcon.php';
 function getDailyEarnings($date, $account_id) {
     global $conn;
     
-    $query = "SELECT p.payment_id, p.amount_paid, p.date, r.rent_id, b.bike_id, b.bike_name, bt.bike_type_name, b.image_path, rt.rate_per_minute r.start_time, r.end_time
+    $query = "SELECT p.payment_id, p.amount_paid, p.date, r.rent_id, b.bike_id, b.bike_name, bt.bike_type_name, b.image_path, rt.rate_per_minute, r.start_time, r.end_time
               FROM payment_tbl p 
               JOIN rental_tbl r ON p.rent_id = r.rent_id 
               JOIN bike_tbl b ON r.bike_id = b.bike_id 
