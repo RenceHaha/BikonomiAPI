@@ -11,16 +11,15 @@
 <script>
     async function fetchBikes() {
             try {
-                const response = await fetch('./users.php', {
+                const response = await fetch('./earnings_api.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        action: 'add',
-                        username: 'mark',
-                        email: 'markclarencemarfil@gmail.com',
-                        password: 'mark'
+                        action: "daily",
+                        account_id: 23,
+                        date: "2025-04-08"
                     })
                 });
 
@@ -32,7 +31,7 @@
                     if (data.success) {
                         console.log(data)
                     } else {
-                        console.error('Server returned error:', data.error);
+                        console.error('Server returned error:', responseText);
                     }
                 } catch (parseError) {
                     console.error('Failed to parse JSON response:', parseError);

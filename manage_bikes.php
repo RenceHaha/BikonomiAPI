@@ -23,6 +23,15 @@ if ($method === 'POST' && isset($data['action'])) {
         case 'fetchCount' :
             fetchBikeCount($data);
             break;
+        case 'rentBike' :
+            rentBike($data);
+            break;
+        case 'fetchBikeStatus' :
+            fetchBikeStatus($data);
+            break;
+        case 'endRental' :
+            endRental($data);
+            break;
         default:
             echo json_encode(['success' => false, 'message' => 'Invalid action']);
     }
@@ -214,6 +223,78 @@ function fetchBikes($data){
     $conn->close();
 }
 
+function fetchBikeStatus($data){
+    global $conn;
+
+    if(!isset($data['account_id'])){ 
+        echo json_encode(["success" => false, "message" => "Account ID Missing"]);
+        return;
+    }
+
+    $account_id = $data['account_id'];
+
+    $sql = "SELECT 
+        bike_tbl.bike_id,
+        bike_tbl.account_id,
+        bike_tbl.bike_type_id,
+        bike_tbl.bike_name,
+        bike_tbl.bike_color,
+        bike_tbl.bike_brand,
+        bike_tbl.bike_accessories,
+        bike_tbl.image_path,
+        rate_tbl.rate_id,
+        rate_tbl.rate_per_minute,
+        bike_type_tbl.bike_type_id,
+        bike_type_tbl.bike_type_name,
+        latest_rental.rent_id,
+        latest_rental.start_time,
+        latest_rental.expected_end_time,
+        latest_rental.time_limit,
+        CASE 
+            WHEN latest_rental.bike_id IS NULL THEN 'Available'
+            WHEN latest_rental.end_time IS NOT NULL THEN 'Available'
+            WHEN latest_rental.end_time IS NULL 
+                AND TIMESTAMPDIFF(SECOND, latest_rental.start_time, NOW()) > TIME_TO_SEC(latest_rental.time_limit) THEN 'Overdue'
+            WHEN latest_rental.end_time IS NULL THEN 'Rented'
+        END AS bike_status
+    FROM 
+        bike_tbl
+    LEFT JOIN 
+        rate_tbl ON bike_tbl.bike_id = rate_tbl.bike_id
+    LEFT JOIN 
+        bike_type_tbl ON bike_tbl.bike_type_id = bike_type_tbl.bike_type_id
+    LEFT JOIN (
+        -- Subquery to get the latest rental record for each bike
+        SELECT 
+            rent_id,
+            bike_id,
+            start_time,
+            end_time,
+            time_limit,
+            expected_end_time,
+            ROW_NUMBER() OVER (PARTITION BY bike_id ORDER BY start_time DESC) AS rn
+        FROM 
+            rental_tbl
+    ) AS latest_rental ON bike_tbl.bike_id = latest_rental.bike_id AND latest_rental.rn = 1
+    WHERE 
+        bike_tbl.account_id = ?";
+    $statement = $conn->prepare($sql);
+    $statement->bind_param("i", $account_id);
+    $statement->execute();
+    $result = $statement->get_result();
+    if ($result->num_rows > 0) {
+        $bikes = array();
+        while ($row = $result->fetch_assoc()) {
+            $bikes[] = $row;
+        }
+        echo json_encode(["success" => true, "bikes" => $bikes]);
+    } else {
+        echo json_encode(["success" => false, "message" => "No bikes found"]);
+    }
+    $conn->close();
+}
+
+
 function fetchBikeInfo($data){
     global $conn;
 
@@ -231,11 +312,10 @@ function fetchBikeInfo($data){
     $statement->execute();
     $result = $statement->get_result();
     if ($result->num_rows > 0) {
-        $bikes = array();
-        while ($row = $result->fetch_assoc()) {
-            $bikes[] = $row;
+        if ($row = $result->fetch_assoc()) {
+            echo json_encode(["success" => true, "bikeInfo" => $row]);
         }
-        echo json_encode(["success" => true, "bikes" => $bikes]);
+        
     } else {
         echo json_encode(["success" => false, "message" => "No bikes found"]);
     }
@@ -289,4 +369,100 @@ function fetchBikeCount($data){
 
     $conn->close();
 }
+
+function rentBike($data){
+    global $conn;
+
+    if(!isset($data['bike_id'], $data['start_time'], $data['expected_end_time'])){
+        echo json_encode(['success' => false, 'message' => 'Missing Parameters']);
+    }
+
+    try{
+        $conn->begin_transaction();
+
+        $sql = "SELECT * FROM rate_tbl WHERE bike_id = ? ORDER BY date_time DESC LIMIT 1";
+
+        $rateid = -1;
+        $statement = $conn->prepare($sql);
+        $statement->bind_param("i", $data['bike_id']);
+        $statement->execute();
+        $result = $statement->get_result();
+        if($result->num_rows > 0){
+            if($row = $result->fetch_assoc()){
+                $rateid = $row['rate_id'];
+            }else{
+                echo json_encode(['success' => false, 'message' => 'cant find rate id']);
+                return;
+            }
+        }
+
+        $start_time = $data['start_time'];
+        $end_time = $data['expected_end_time'];
+
+        $start_dt = new DateTime($start_time);
+        $end_dt = new DateTime($end_time);
+
+        $interval = $start_dt->diff($end_dt);
+        $intervalStr = $interval->h . ":" . $interval->i . ":" . $interval->s;
+
+        $sql = "INSERT INTO rental_tbl(bike_id, rate_id, time_limit, start_time, expected_end_time) VALUES(?,?,?,?,?)";
+        $statement = $conn->prepare($sql);
+        $statement->bind_param("iisss", $data['bike_id'], $rateid, $intervalStr, $start_time, $end_time);
+        if($statement->execute()){
+            echo json_encode(['success' => true, 'message' => 'Rental Started...']);
+            $conn->commit();
+        }else{
+            echo json_encode(['success' => false, 'message' => 'Failed to insert to renta table '  . $conn->error]);
+            $conn->rollback();
+            return;
+        }
+
+    }catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        $conn->rollback();
+    } finally {
+        if (isset($statement)) {
+            $statement->close();
+        }
+        $conn->close();
+    }
+}
+
+function endRental($data){
+    global $conn;
+
+    if(!isset($data['rent_id'])){
+        echo json_encode(['success' => false, 'message' => 'Missing Rent ID']);
+        return;
+    }
+
+    try{
+        $sql = "UPDATE rental_tbl SET end_time = ? WHERE rent_id = ?";
+        $statement = $conn->prepare($sql);
+        $statement->bind_param("si", $data['end_time'], $data['rent_id']);
+        if($statement->execute()){
+            echo json_encode(['success' => true, 'message' => 'ended rental successfully']);
+            $conn->commit();
+        }else{
+            echo json_encode(['success' => false, 'message' => 'Unknown error occured: having updating end time']);
+            $conn->rollback();
+        }
+    }catch(Exception $e){
+        echo json_encode(['success' => false, 'message' => 'API Error: ' . $e->getMessage()]);
+        $conn->rollback();
+    }finally{
+        $conn->close();
+    }
+}
+
+function fetchAllStatus($data){
+    global $conn;
+    
+    if(!isset($data['account_id'])){
+        echo json_encode(['success' => false, 'message' => 'Missing Account ID']);
+    }
+
+
+}
+
 ?>
