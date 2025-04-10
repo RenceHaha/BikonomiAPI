@@ -4,7 +4,7 @@
     $dbname="bikonomi_1";
     $password="Marfil@123";
 
-    $dbservername = "5.181.217.90";
+    $dbservername = "localhost";
     $dbusername = $username;
     $dbpassword = $password;
     $mysqldbname = $dbname;
