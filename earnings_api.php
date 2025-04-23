@@ -9,7 +9,7 @@ function getDailyEarnings($date, $account_id) {
               FROM payment_tbl p 
               JOIN rental_tbl r ON p.rent_id = r.rent_id 
               JOIN bike_tbl b ON r.bike_id = b.bike_id 
-              JOIN rate_tbl rt ON rt.rate_id = rt.rate_id
+              JOIN rate_tbl rt ON rt.bike_id = r.bike_id
               JOIN bike_type_tbl bt ON b.bike_type_id = bt.bike_type_id 
               WHERE DATE(p.date) = ? AND b.account_id = ?";
     
@@ -79,7 +79,7 @@ function getRentalIncome($rentalId, $account_id) {
 }
 
 // Function to get weekly earnings
-function getWeeklyEarnings($month, $year, $account_id) {
+function getWeeklyEarnings($date, $account_id) {
     global $conn;
     
     // Get weekly earnings and organize by month
@@ -92,12 +92,13 @@ function getWeeklyEarnings($month, $year, $account_id) {
                 SUM(p.amount_paid) as total 
               FROM payment_tbl p 
               JOIN rental_tbl r ON p.rent_id = r.rent_id 
-              WHERE YEAR(p.date) = ? AND r.account_id = ? 
+              JOIN bike_tbl b ON r.bike_id = b.bike_id
+              WHERE YEAR(p.date) = ? AND b.account_id = ? 
               GROUP BY MONTH(p.date), WEEKOFYEAR(p.date) 
               ORDER BY month ASC, week_num DESC";
     
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ii", $year, $account_id);
+    $stmt->bind_param("si", $date, $account_id);
     $stmt->execute();
     $result = $stmt->get_result();
     
@@ -106,7 +107,6 @@ function getWeeklyEarnings($month, $year, $account_id) {
     
     while ($row = $result->fetch_assoc()) {
         $monthName = date('F', mktime(0, 0, 0, $row['month'], 1));
-        $monthShort = date('M', mktime(0, 0, 0, $row['month'], 1));
         $year = $row['year'];
         // Format date range as MM.DD - MM.DD
         $weekStart = date('m.d', strtotime($row['week_start']));
@@ -116,7 +116,7 @@ function getWeeklyEarnings($month, $year, $account_id) {
         // Initialize month data if not set
         if (!isset($monthlyData[$row['month']])) {
             $monthlyData[$row['month']] = [
-                'month' => $monthShort,
+                'month' => $monthName,
                 'year' => $year,
                 'amount' => 0,
                 'Range' => []
@@ -150,7 +150,7 @@ function getWeeklyEarnings($month, $year, $account_id) {
 }
 
 // Function to get monthly earnings
-function getMonthlyEarnings($year, $account_id) {
+function getMonthlyEarnings($date, $account_id) {
     global $conn;
     
     $query = "SELECT MONTH(p.date) as month, 
@@ -163,7 +163,7 @@ function getMonthlyEarnings($year, $account_id) {
               ORDER BY month";
     
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ii", $year, $account_id);
+    $stmt->bind_param("si", $date, $account_id);
     $stmt->execute();
     $result = $stmt->get_result();
     
@@ -337,17 +337,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
                 
             case 'weekly':
-                if (isset($data['year'])) {
-                    $month = isset($data['month']) ? $data['month'] : null;
-                    echo json_encode(getWeeklyEarnings($month, $data['year'], $data['account_id']));
+                if (isset($data['date'])) {
+                    echo json_encode(getWeeklyEarnings($data['date'], $data['account_id']));
                 } else {
-                    echo json_encode(['success' => false, 'message' => 'Year parameter required']);
+                    echo json_encode(['success' => false, 'message' => 'Date parameter required']);
                 }
                 break;
                 
             case 'monthly':
-                if (isset($data['year'])) {
-                    echo json_encode(getMonthlyEarnings($data['year'], $data['account_id']));
+                if (isset($data['date'])) {
+                    echo json_encode(getMonthlyEarnings($data['date'], $data['account_id']));
                 } else {
                     echo json_encode(['success' => false, 'message' => 'Year parameter required']);
                 }
