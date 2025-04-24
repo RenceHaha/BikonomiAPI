@@ -80,7 +80,8 @@ $server = IoServer::factory(
             new GpsHandler()
         )
     ),
-    8080
+    8080,
+    '5.181.217.90'
 );
 echo "Starting WebSocket server on port 8080...\n";
 $server->run();
