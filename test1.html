@@ -11,13 +11,14 @@
 <script>
     async function fetchBikes() {
             try {
-                const response = await fetch('./notification_api.php', {
+                const response = await fetch('./peak_rental_prediction.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        account_id: 23
+                        account_id: 23, // Use the account ID instead of bike_id
+                        days_to_analyze: 90 // Analyze more days for better patterns
                     })
                 });
 
