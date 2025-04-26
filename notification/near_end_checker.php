@@ -2,7 +2,7 @@
 // Set the timezone if not already set globally
 date_default_timezone_set('Asia/Manila'); // Set to your server's timezone
 
-require_once('../dbcon.php'); // Include your database connection
+require_once(__DIR__ . '/../../BikonomiAPI/dbcon.php');
 
 // --- Configuration ---
 $notification_threshold_minutes = 15; // Notify when there are 15 minutes or less before rental ends

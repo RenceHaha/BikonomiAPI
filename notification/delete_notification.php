@@ -1,5 +1,5 @@
 <?php 
-require_once('../dbcon.php'); 
+require_once(__DIR__ . '/../../BikonomiAPI/dbcon.php');
 
 header('Content-Type: application/json');
 
