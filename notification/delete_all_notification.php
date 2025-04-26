@@ -37,7 +37,7 @@ try {
         throw new Exception("Prepare failed: (" . $conn->errno . ") " . $conn->error);
     }
 
-    $stmt->bind_param("ii", $data['notification_id'], $data['account_id']);
+    $stmt->bind_param("i", $data['account_id']);
     if($stmt->execute()){
         if($stmt->affected_rows > 0){
             echo json_encode(["success" => true, "message" => "Successfully updated is_deleted to 1 for account id " . $data['account_id']]);
