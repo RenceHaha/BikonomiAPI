@@ -18,6 +18,11 @@ if (!$conn || !$conn->ping()) {
     exit(1); // Exit with an error code
 }
 
+// Add at the top of your script
+$logFile = __DIR__ . '/overdue_log.txt';
+file_put_contents($logFile, "Script started at " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+
+// Keep the rest of your script as is, but add logging at key points
 try {
     // Find overdue rentals that haven't had a notification sent yet
     // Assumes you add a column like `overdue_notification_sent_at` (DATETIME NULL DEFAULT NULL) to rental_tbl
@@ -85,14 +90,18 @@ try {
     $stmt->close();
     echo "Finished. Notifications sent: " . $notifications_sent . "\n";
 
+    // Add logging for important events
+    file_put_contents($logFile, "Found {$result->num_rows} overdue rentals\n", FILE_APPEND);
+    
 } catch (Exception $e) {
-    echo "An error occurred: " . $e->getMessage() . "\n";
-    // Log the error details
-    exit(1); // Exit with an error code
+    $errorMessage = "An error occurred: " . $e->getMessage() . "\n";
+    file_put_contents($logFile, $errorMessage, FILE_APPEND);
+    exit(1);
 } finally {
     if ($conn) {
         $conn->close();
     }
+    file_put_contents($logFile, "Script completed at " . date('Y-m-d H:i:s') . "\n\n", FILE_APPEND);
 }
 
 exit(0); // Exit successfully
