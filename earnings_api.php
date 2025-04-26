@@ -1,6 +1,35 @@
 <?php
 include 'dbcon.php';
 
+function insertPayment($data){
+
+    global $conn;
+
+    if(!isset($data['rent_id'])){
+        echo json_encode(['success' => false, 'message' => 'Missing Rent ID']);
+        return;
+    }
+
+    try{
+        $sql = "INSERT INTO payment_tbl(rent_id, amount_paid, date) VALUES(?,?,?)";
+        $statement = $conn->prepare($sql);
+        $statement->bind_param("iss", $data['rent_id'], $data['amount_paid'], $data['date']);
+        if($statement->execute()){
+            echo json_encode(['success' => true, 'message' => 'successfully inserted into payment table']);
+            $conn->commit();
+        }else{
+            echo json_encode(['success' => false, 'message' => 'Unknown error occured: having trouble inserting']);
+            $conn->rollback();
+        }
+    }catch(Exception $e){
+        echo json_encode(['success' => false, 'message' => 'API Error: ' . $e->getMessage()]);
+        $conn->rollback();
+    }finally{
+        $conn->close();
+    }
+
+}
+
 // Function to get daily earnings
 function getDailyEarnings($date, $account_id) {
     global $conn;
@@ -359,6 +388,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'summary':
                 $date = isset($data['date']) ? $data['date'] : null;
                 echo json_encode(getEarningsSummary($data['account_id'], $date));
+                break;
+                
+            case 'insertPayment':
+                insertPayment($data);
                 break;
                 
             default:

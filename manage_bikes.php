@@ -250,6 +250,8 @@ function fetchBikeStatus($data){
         latest_rental.start_time,
         latest_rental.expected_end_time,
         latest_rental.time_limit,
+        bike_location.longitude,
+        bike_location.latitude,
         CASE 
             WHEN latest_rental.bike_id IS NULL THEN 'Available'
             WHEN latest_rental.end_time IS NOT NULL THEN 'Available'
@@ -259,6 +261,8 @@ function fetchBikeStatus($data){
         END AS bike_status
     FROM 
         bike_tbl
+    LEFT JOIN 
+        bike_location ON bike_tbl.bike_serial_gps = bike_location.bike_serial_gps
     LEFT JOIN 
         rate_tbl ON bike_tbl.bike_id = rate_tbl.bike_id
     LEFT JOIN 
@@ -455,14 +459,5 @@ function endRental($data){
     }
 }
 
-function fetchAllStatus($data){
-    global $conn;
-    
-    if(!isset($data['account_id'])){
-        echo json_encode(['success' => false, 'message' => 'Missing Account ID']);
-    }
-
-
-}
 
 ?>
