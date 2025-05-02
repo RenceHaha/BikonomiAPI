@@ -11,14 +11,15 @@
 <script>
     async function fetchBikes() {
             try {
-                const response = await fetch('./users.php', {
+                const response = await fetch('./earnings_api.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
+                        action: 'weekly',
                         account_id: 23, // Use the account ID instead of bike_id
-                        days_to_analyze: 90 // Analyze more days for better patterns
+                        date: '2025-04-26'
                     })
                 });
 

@@ -134,9 +134,43 @@ function changePassword($data) {
 function editProfile($data) {
     global $conn;
 
+    $imagePath = null;
+
     if (!isset($data['account_id'])) {
         echo json_encode(['success' => false, 'message' => 'Account ID is required']);
         return;
+    }
+
+    if (isset($data['image'])) {
+        $base64String = $data['image'];
+        // Check if the base64 string is valid
+        if (preg_match('/^data:image\/(\w+);base64,/', $base64String, $type)) {
+            $base64String = substr($base64String, strpos($base64String, ',') + 1);
+            $imageType = strtolower($type[1]); // This is the image type (jpg, png, gif)
+
+            // Decode the base64 string
+            $base64String = base64_decode($base64String);
+            if ($base64String === false) {
+                echo json_encode(['success' => false, 'message' => 'Base64 decode failed.']);
+                return;
+            }
+
+            // Set the target directory and file name
+            $targetDir = "images/"; // Adjust this path as needed
+            $fileName = uniqid() . '.' . $imageType; // Generate a unique file name with the correct image type
+            $targetFile = $targetDir . $fileName;
+
+            // Save the image to the target directory
+            if (file_put_contents($targetFile, $base64String) !== false) {
+                $imagePath = $targetFile; // Set the path if the upload is successful
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to save the image.']);
+                return;
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid base64 image format.']);
+            return;
+        }
     }
 
     $account_id = $data['account_id'];
@@ -181,8 +215,10 @@ function editProfile($data) {
                 $statement->execute();
                 $statement->close();
             }
+
         }
         
+
         // Handle user_tbl (profile details)
         if (isset($data['first_name']) || isset($data['middle_name']) || isset($data['last_name']) || isset($data['suffix']) || isset($data['contact'])) {
             
@@ -193,13 +229,23 @@ function editProfile($data) {
                 $last_name = $data['last_name'] ?? '';
                 $suffix = $data['suffix'] ?? '';
                 $contact = $data['contact'] ?? '';
+
+                if(isset($imagePath)){
+                    $insert_sql = "INSERT INTO user_tbl (account_id, first_name, middle_name, last_name, suffix, contact, image_path)
+                                   VALUES (?,?,?,?,?,?,?)";
+                    $insert_statement = $conn->prepare($insert_sql);
+                    $insert_statement->bind_param("issssss", $account_id, $first_name, $middle_name, $last_name, $suffix, $contact, $imagePath);
+                    $insert_statement->execute();
+                    $insert_statement->close();
+                }else{
+                    $insert_sql = "INSERT INTO user_tbl (account_id, first_name, middle_name, last_name, suffix, contact) 
+                    VALUES (?, ?, ?, ?, ?, ?)";
+                    $insert_statement = $conn->prepare($insert_sql);
+                    $insert_statement->bind_param("isssss", $account_id, $first_name, $middle_name, $last_name, $suffix, $contact);
+                    $insert_statement->execute();
+                    $insert_statement->close();
+                }
                 
-                $insert_sql = "INSERT INTO user_tbl (account_id, first_name, middle_name, last_name, suffix, contact) 
-                               VALUES (?, ?, ?, ?, ?, ?)";
-                $insert_statement = $conn->prepare($insert_sql);
-                $insert_statement->bind_param("isssss", $account_id, $first_name, $middle_name, $last_name, $suffix, $contact);
-                $insert_statement->execute();
-                $insert_statement->close();
             } 
             // Otherwise, update existing record
             else {
@@ -235,6 +281,12 @@ function editProfile($data) {
                     $user_fields[] = "contact = ?";
                     $user_params[] = $data['contact'];
                     $user_types .= "s";
+                }
+
+                if(isset($imagePath)){
+                    $user_fields[] = "image_path =?";
+                    $user_params[] = $imagePath;
+                    $user_types.= "s";
                 }
                 
                 if (!empty($user_fields)) {
