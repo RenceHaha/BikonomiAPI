@@ -619,22 +619,6 @@ function editBike($data) {
                 throw new Exception("Failed to update rate: " . $conn->error);
             }
         }
-
-        $fetchNewRateID = "SELECT rate_id FROM rate_tbl WHERE bike_id =? ORDER BY rate_id DESC LIMIT 1";
-        $rateStatement = $conn->prepare($fetchNewRateID);
-        $rateStatement->bind_param("i", $bike_id);
-        $rateStatement->execute();
-        $rateResult = $rateStatement->get_result();
-        if ($rateResult->num_rows > 0) {
-            $rateRow = $rateResult->fetch_assoc();
-            $rate_id = $rateRow['rate_id'];
-            $updateRateSql = "UPDATE bike_tbl SET rate_id =? WHERE bike_id =?";
-            $updateRateStatement = $conn->prepare($updateRateSql); 
-            $updateRateStatement->bind_param("ii", $rate_id, $bike_id);
-            if (!$updateRateStatement->execute()) {
-                throw new Exception("Failed to update rate: ". $conn->error);
-            }
-        }
         
         // Commit the transaction
         $conn->commit();
