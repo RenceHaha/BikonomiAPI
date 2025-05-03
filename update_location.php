@@ -42,6 +42,27 @@ if ($result->num_rows > 0) {
     $stmt->bind_param("dds", $latitude, $longitude, $gps_serial);
     $stmt->execute();
     if($stmt->affected_rows > 0){
+        // Check if the status is 'lost' and rental_tbl has a null end_time
+        $status_query = "
+            SELECT r.end_time 
+            FROM bike_location bl
+            JOIN bike_tbl b ON bl.bike_serial_gps = b.bike_serial_gps
+            JOIN rental_tbl r ON b.bike_id = r.bike_id
+            WHERE bl.bike_serial_gps = ? AND bl.status = 'lost' AND r.end_time IS NULL
+        ";
+        $status_stmt = $conn->prepare($status_query);
+        $status_stmt->bind_param("s", $gps_serial);
+        $status_stmt->execute();
+        $status_result = $status_stmt->get_result();
+
+        if ($status_result->num_rows > 0) {
+            // Update status to 'active'
+            $update_status_query = "UPDATE bike_location SET status = 'active' WHERE bike_serial_gps = ?";
+            $status_stmt = $conn->prepare($update_status_query);
+            $status_stmt->bind_param("s", $gps_serial);
+            $status_stmt->execute();
+        }
+
         echo json_encode(['success' => true,'message' => 'GPS Serial updated successfully']);
         exit;
     }else{
