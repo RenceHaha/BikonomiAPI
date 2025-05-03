@@ -11,16 +11,13 @@
 <script>
     async function fetchBikes() {
             try {
-                const response = await fetch('./manage_bikes.php', {
+                const response = await fetch('./gps_check_rental.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        action: 'editBike',
-                        account_id: 1, // Use the account ID instead of bike_id
-                        bike_id: 1, // Remove this line or set it to null if you don't need it
-                        name: 'test'
+                        gps_serial: '91827372he'
                     })
                 });
 
