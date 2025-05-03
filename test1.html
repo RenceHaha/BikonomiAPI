@@ -17,9 +17,10 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        action: 'fetchBikeInfo',
-                        account_id: 23, // Use the account ID instead of bike_id
+                        action: 'editBike',
+                        account_id: 1, // Use the account ID instead of bike_id
                         bike_id: 1, // Remove this line or set it to null if you don't need it
+                        name: 'test'
                     })
                 });
 
