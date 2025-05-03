@@ -26,7 +26,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     // Check if there is an active rental
-    $rental_query = "SELECT start_time, expected_end_time, NOW() AS now  FROM rental_tbl
+    $rental_query = "SELECT start_time, expected_end_time, NOW() AS time_now  FROM rental_tbl
     JOIN bike_tbl ON bike_tbl.bike_id = rental_tbl.bike_id WHERE bike_serial_gps = ? AND end_time IS NULL";
     $rental_stmt = $conn->prepare($rental_query);
     $rental_stmt->bind_param("s", $gps_serial);
@@ -39,7 +39,7 @@ if ($result->num_rows > 0) {
             'success' => true,
             'message' => 'Rental found',
             'start_time' => $rental_data['start_time'],
-            'now' => $rental_data['now'],
+            'time_now' => $rental_data['time_now'],
             'expected_end_time' => $rental_data['expected_end_time']
         ]);
         exit;
