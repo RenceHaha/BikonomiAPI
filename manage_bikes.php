@@ -17,6 +17,9 @@ if ($method === 'POST' && isset($data['action'])) {
         case 'fetchAll':
             fetchBikes($data);
             break;
+        case 'editBike':
+            editBike($data);
+            break;
         case 'fetchBikeInfo':
             fetchBikeInfo($data);
             break;
@@ -250,8 +253,6 @@ function fetchBikeStatus($data){
         latest_rental.start_time,
         latest_rental.expected_end_time,
         latest_rental.time_limit,
-        bike_location.longitude,
-        bike_location.latitude,
         CASE 
             WHEN latest_rental.bike_id IS NULL THEN 'Available'
             WHEN latest_rental.end_time IS NOT NULL THEN 'Available'
@@ -261,8 +262,6 @@ function fetchBikeStatus($data){
         END AS bike_status
     FROM 
         bike_tbl
-    LEFT JOIN 
-        bike_location ON bike_tbl.bike_serial_gps = bike_location.bike_serial_gps
     LEFT JOIN 
         rate_tbl ON bike_tbl.bike_id = rate_tbl.bike_id
     LEFT JOIN 
@@ -459,5 +458,178 @@ function endRental($data){
     }
 }
 
+
+function editBike($data) {
+    global $conn;
+
+    // Check for required parameters
+    if (!isset($data['bike_id'], $data['account_id'])) {
+        echo json_encode(['success' => false, 'message' => 'Missing required parameters']);
+        return;
+    }
+
+    $bike_id = $data['bike_id'];
+    $account_id = $data['account_id'];
+    
+    // Start transaction
+    try {
+        $conn->begin_transaction();
+        
+        // First, verify the bike belongs to this account
+        $checkSql = "SELECT * FROM bike_tbl WHERE bike_id = ? AND account_id = ?";
+        $statement = $conn->prepare($checkSql);
+        $statement->bind_param("ii", $bike_id, $account_id);
+        $statement->execute();
+        $result = $statement->get_result();
+        
+        if ($result->num_rows === 0) {
+            echo json_encode(['success' => false, 'message' => 'Bike not found or does not belong to this account']);
+            return;
+        }
+        
+        // Build the update query dynamically based on provided fields
+        $updateFields = [];
+        $types = "";
+        $params = [];
+        
+        // Check and add each possible field to update
+        if (isset($data['name'])) {
+            $updateFields[] = "bike_name = ?";
+            $types .= "s";
+            $params[] = $data['name'];
+        }
+        
+        if (isset($data['color'])) {
+            $updateFields[] = "bike_color = ?";
+            $types .= "s";
+            $params[] = $data['color'];
+        }
+        
+        if (isset($data['brand'])) {
+            $updateFields[] = "bike_brand = ?";
+            $types .= "s";
+            $params[] = $data['brand'];
+        }
+        
+        if (isset($data['accessories'])) {
+            $updateFields[] = "bike_accessories = ?";
+            $types .= "s";
+            $params[] = $data['accessories'];
+        }
+        
+        if (isset($data['gps_serial'])) {
+            $updateFields[] = "bike_serial_gps = ?";
+            $types .= "s";
+            $params[] = $data['gps_serial'];
+        }
+        
+        // Handle bike type update
+        if (isset($data['type'])) {
+            $bikeType = $data['type'];
+            
+            // Check if the bike type exists
+            $typeSql = "SELECT bike_type_id FROM bike_type_tbl WHERE bike_type_name = ?";
+            $typeStatement = $conn->prepare($typeSql);
+            $typeStatement->bind_param("s", $bikeType);
+            $typeStatement->execute();
+            $typeResult = $typeStatement->get_result();
+            
+            if ($typeResult->num_rows > 0) {
+                // If the bike type exists, get its ID
+                $typeRow = $typeResult->fetch_assoc();
+                $typeId = $typeRow['bike_type_id'];
+            } else {
+                // If the bike type doesn't exist, create it
+                $insertTypeSql = "INSERT INTO bike_type_tbl(bike_type_name) VALUES(?)";
+                $insertTypeStatement = $conn->prepare($insertTypeSql);
+                $insertTypeStatement->bind_param("s", $bikeType);
+                
+                if (!$insertTypeStatement->execute()) {
+                    throw new Exception("Failed to create new bike type: " . $conn->error);
+                }
+                
+                $typeId = $conn->insert_id;
+            }
+            
+            // Add bike_type_id to the fields to update
+            $updateFields[] = "bike_type_id = ?";
+            $types .= "i";
+            $params[] = $typeId;
+        }
+        
+        // Handle image update if provided
+        if (isset($data['image']) && !empty($data['image'])) {
+            $base64String = $data['image'];
+            
+            // Check if the base64 string is valid
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64String, $type)) {
+                $base64String = substr($base64String, strpos($base64String, ',') + 1);
+                $imageType = strtolower($type[1]);
+                
+                // Decode the base64 string
+                $base64String = base64_decode($base64String);
+                if ($base64String === false) {
+                    throw new Exception('Base64 decode failed.');
+                }
+                
+                // Set the target directory and file name
+                $targetDir = "images/";
+                $fileName = uniqid() . '.' . $imageType;
+                $targetFile = $targetDir . $fileName;
+                
+                // Save the image to the target directory
+                if (file_put_contents($targetFile, $base64String) !== false) {
+                    $updateFields[] = "image_path = ?";
+                    $types .= "s";
+                    $params[] = $targetFile;
+                } else {
+                    throw new Exception('Failed to save the image.');
+                }
+            } else {
+                throw new Exception('Invalid base64 image format.');
+            }
+        }
+        
+        // If there are fields to update
+        if (!empty($updateFields)) {
+            $updateSql = "UPDATE bike_tbl SET " . implode(", ", $updateFields) . " WHERE bike_id = ? AND account_id = ?";
+            $types .= "ii";
+            $params[] = $bike_id;
+            $params[] = $account_id;
+            
+            $updateStatement = $conn->prepare($updateSql);
+            
+            // Bind parameters dynamically
+            $bindParams = array_merge([$updateStatement, $types], $params);
+            call_user_func_array('mysqli_stmt_bind_param', $bindParams);
+            
+            if (!$updateStatement->execute()) {
+                throw new Exception("Failed to update bike: " . $conn->error);
+            }
+        }
+        
+        // Update rate if provided
+        if (isset($data['rate_per_minute'])) {
+            $insertRateSql = "INSERT INTO rate_tbl(bike_id, rate_per_minute, date_time) VALUES(?, ?, ?)";
+            $rateStatement = $conn->prepare($insertRateSql);
+            $date_time = date('Y-m-d H:i:s');
+            $rateStatement->bind_param("ids", $bike_id, $data['rate_per_minute'], $date_time);
+            
+            if (!$rateStatement->execute()) {
+                throw new Exception("Failed to update rate: " . $conn->error);
+            }
+        }
+        
+        // Commit the transaction
+        $conn->commit();
+        echo json_encode(['success' => true, 'message' => 'Bike updated successfully']);
+        
+    } catch (Exception $e) {
+        $conn->rollback();
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    } finally {
+        $conn->close();
+    }
+}
 
 ?>

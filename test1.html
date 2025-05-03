@@ -11,15 +11,15 @@
 <script>
     async function fetchBikes() {
             try {
-                const response = await fetch('./earnings_api.php', {
+                const response = await fetch('./manage_bikes.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        action: 'weekly',
+                        action: 'fetchBikeInfo',
                         account_id: 23, // Use the account ID instead of bike_id
-                        date: '2025-04-26'
+                        bike_id: 1, // Remove this line or set it to null if you don't need it
                     })
                 });
 

@@ -1,7 +1,7 @@
 <?php
 
     $username="marfil";
-    $dbname="bikonomi_1";
+    $dbname="bikonomi_2";
     $password="Marfil@123";
 
     $dbservername = "localhost";
