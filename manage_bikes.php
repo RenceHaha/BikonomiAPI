@@ -610,10 +610,10 @@ function editBike($data) {
         
         // Update rate if provided
         if (isset($data['rate_per_minute'])) {
-            $insertRateSql = "INSERT INTO rate_tbl(bike_id, rate_per_minute, date_time) VALUES(?, ?, ?)";
+            $insertRateSql = "UPDATE rate_tbl SET rate_per_minute = ?, date_time = ? WHERE bike_id = ?";
             $rateStatement = $conn->prepare($insertRateSql);
             $date_time = date('Y-m-d H:i:s');
-            $rateStatement->bind_param("ids", $bike_id, $data['rate_per_minute'], $date_time);
+            $rateStatement->bind_param("dsi", $data['rate_per_minute'], $date_time, $bike_id);
             
             if (!$rateStatement->execute()) {
                 throw new Exception("Failed to update rate: " . $conn->error);
