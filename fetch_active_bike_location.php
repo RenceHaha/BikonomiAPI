@@ -36,7 +36,7 @@ $bike_locations = [];
 while ($row = $result->fetch_assoc()) {
     $bike_locations[] = $row;
 }
-if(empty($locations)){
+if(empty($bike_locations)){
     echo json_encode(['success' => false, 'message' => 'No Bike with GPS Active Rental Found']);
     exit; 
 }
