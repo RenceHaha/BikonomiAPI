@@ -16,7 +16,7 @@ if(!isset($data['account_id'])){
     exit;
 }
 
-$query = "SELECT longitude, latitude, bike_tbl.bike_id, bike_type_name, bike_name, rent_id, start_time, expected_end_time,
+$query = "SELECT longitude, latitude, bike_tbl.bike_id, bike_type_name, bike_name, rent_id, start_time, expected_end_time, bike_tbl.image_path,
 CASE 
     WHEN rental_tbl.end_time IS NULL 
         AND TIMESTAMPDIFF(SECOND, rental_tbl.start_time, NOW()) > TIME_TO_SEC(rental_tbl.time_limit) THEN 'Overdue'
