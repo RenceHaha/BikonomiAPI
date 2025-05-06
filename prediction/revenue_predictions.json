@@ -1,0 +1,328 @@
+{
+  "historical_data": [
+    {
+      "date": "2025-03-01",
+      "actual_revenue": 705.0
+    },
+    {
+      "date": "2025-03-02",
+      "actual_revenue": 450.0
+    },
+    {
+      "date": "2025-03-03",
+      "actual_revenue": 1080.0
+    },
+    {
+      "date": "2025-03-04",
+      "actual_revenue": 300.0
+    },
+    {
+      "date": "2025-03-05",
+      "actual_revenue": 675.0
+    },
+    {
+      "date": "2025-03-06",
+      "actual_revenue": 225.0
+    },
+    {
+      "date": "2025-03-07",
+      "actual_revenue": 810.0
+    },
+    {
+      "date": "2025-03-08",
+      "actual_revenue": 915.0
+    },
+    {
+      "date": "2025-03-09",
+      "actual_revenue": 600.0
+    },
+    {
+      "date": "2025-03-10",
+      "actual_revenue": 810.0
+    },
+    {
+      "date": "2025-03-11",
+      "actual_revenue": 300.0
+    },
+    {
+      "date": "2025-03-12",
+      "actual_revenue": 405.0
+    },
+    {
+      "date": "2025-03-13",
+      "actual_revenue": 375.0
+    },
+    {
+      "date": "2025-03-14",
+      "actual_revenue": 810.0
+    },
+    {
+      "date": "2025-03-15",
+      "actual_revenue": 975.0
+    },
+    {
+      "date": "2025-03-16",
+      "actual_revenue": 450.0
+    },
+    {
+      "date": "2025-03-17",
+      "actual_revenue": 1080.0
+    },
+    {
+      "date": "2025-03-18",
+      "actual_revenue": 225.0
+    },
+    {
+      "date": "2025-03-19",
+      "actual_revenue": 540.0
+    },
+    {
+      "date": "2025-03-20",
+      "actual_revenue": 375.0
+    },
+    {
+      "date": "2025-03-21",
+      "actual_revenue": 810.0
+    },
+    {
+      "date": "2025-03-22",
+      "actual_revenue": 705.0
+    },
+    {
+      "date": "2025-03-23",
+      "actual_revenue": 450.0
+    },
+    {
+      "date": "2025-03-24",
+      "actual_revenue": 675.0
+    },
+    {
+      "date": "2025-03-25",
+      "actual_revenue": 300.0
+    },
+    {
+      "date": "2025-03-26",
+      "actual_revenue": 1080.0
+    },
+    {
+      "date": "2025-03-27",
+      "actual_revenue": 225.0
+    },
+    {
+      "date": "2025-03-28",
+      "actual_revenue": 810.0
+    },
+    {
+      "date": "2025-03-29",
+      "actual_revenue": 915.0
+    },
+    {
+      "date": "2025-03-30",
+      "actual_revenue": 450.0
+    },
+    {
+      "date": "2025-03-31",
+      "actual_revenue": 675.0
+    },
+    {
+      "date": "2025-04-01",
+      "actual_revenue": 705.0
+    },
+    {
+      "date": "2025-04-02",
+      "actual_revenue": 450.0
+    },
+    {
+      "date": "2025-04-03",
+      "actual_revenue": 1080.0
+    },
+    {
+      "date": "2025-04-04",
+      "actual_revenue": 300.0
+    },
+    {
+      "date": "2025-04-05",
+      "actual_revenue": 675.0
+    },
+    {
+      "date": "2025-04-06",
+      "actual_revenue": 225.0
+    },
+    {
+      "date": "2025-04-07",
+      "actual_revenue": 810.0
+    },
+    {
+      "date": "2025-04-08",
+      "actual_revenue": 915.0
+    },
+    {
+      "date": "2025-04-09",
+      "actual_revenue": 600.0
+    },
+    {
+      "date": "2025-04-10",
+      "actual_revenue": 810.0
+    },
+    {
+      "date": "2025-04-11",
+      "actual_revenue": 300.0
+    },
+    {
+      "date": "2025-04-12",
+      "actual_revenue": 405.0
+    },
+    {
+      "date": "2025-04-13",
+      "actual_revenue": 375.0
+    },
+    {
+      "date": "2025-04-14",
+      "actual_revenue": 810.0
+    },
+    {
+      "date": "2025-04-15",
+      "actual_revenue": 975.0
+    },
+    {
+      "date": "2025-04-16",
+      "actual_revenue": 450.0
+    },
+    {
+      "date": "2025-04-17",
+      "actual_revenue": 1080.0
+    },
+    {
+      "date": "2025-04-18",
+      "actual_revenue": 225.0
+    },
+    {
+      "date": "2025-04-19",
+      "actual_revenue": 540.0
+    },
+    {
+      "date": "2025-04-20",
+      "actual_revenue": 375.0
+    },
+    {
+      "date": "2025-04-21",
+      "actual_revenue": 810.0
+    },
+    {
+      "date": "2025-04-22",
+      "actual_revenue": 705.0
+    },
+    {
+      "date": "2025-04-23",
+      "actual_revenue": 450.0
+    },
+    {
+      "date": "2025-04-24",
+      "actual_revenue": 675.0
+    },
+    {
+      "date": "2025-04-25",
+      "actual_revenue": 300.0
+    },
+    {
+      "date": "2025-04-26",
+      "actual_revenue": 1080.0
+    },
+    {
+      "date": "2025-04-27",
+      "actual_revenue": 225.0
+    },
+    {
+      "date": "2025-04-28",
+      "actual_revenue": 810.0
+    },
+    {
+      "date": "2025-04-29",
+      "actual_revenue": 915.0
+    },
+    {
+      "date": "2025-04-30",
+      "actual_revenue": 1125.0
+    },
+    {
+      "date": "2025-05-01",
+      "actual_revenue": 975.0
+    },
+    {
+      "date": "2025-05-02",
+      "actual_revenue": 855.0
+    },
+    {
+      "date": "2025-05-03",
+      "actual_revenue": 1140.0
+    },
+    {
+      "date": "2025-05-04",
+      "actual_revenue": 1185.0
+    },
+    {
+      "date": "2025-05-05",
+      "actual_revenue": 1380.0
+    },
+    {
+      "date": "2025-05-06",
+      "actual_revenue": 225.0
+    }
+  ],
+  "predictions": [
+    {
+      "date": "2025-05-08",
+      "predicted_revenue": 734.79,
+      "lower_bound": 500.88,
+      "upper_bound": 961.12
+    },
+    {
+      "date": "2025-05-09",
+      "predicted_revenue": 859.24,
+      "lower_bound": 629.5,
+      "upper_bound": 1081.4
+    },
+    {
+      "date": "2025-05-10",
+      "predicted_revenue": 933.12,
+      "lower_bound": 705.16,
+      "upper_bound": 1169.96
+    },
+    {
+      "date": "2025-05-11",
+      "predicted_revenue": 579.32,
+      "lower_bound": 351.25,
+      "upper_bound": 810.18
+    },
+    {
+      "date": "2025-05-12",
+      "predicted_revenue": 1041.68,
+      "lower_bound": 811.43,
+      "upper_bound": 1267.74
+    },
+    {
+      "date": "2025-05-13",
+      "predicted_revenue": 739.43,
+      "lower_bound": 513.72,
+      "upper_bound": 947.56
+    },
+    {
+      "date": "2025-05-14",
+      "predicted_revenue": 584.05,
+      "lower_bound": 364.7,
+      "upper_bound": 820.42
+    },
+    {
+      "date": "2025-05-15",
+      "predicted_revenue": 757.31,
+      "lower_bound": 521.22,
+      "upper_bound": 968.97
+    },
+    {
+      "date": "2025-05-16",
+      "predicted_revenue": 881.76,
+      "lower_bound": 678.62,
+      "upper_bound": 1116.68
+    }
+  ]
+}
