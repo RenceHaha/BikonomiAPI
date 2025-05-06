@@ -16,7 +16,7 @@ if(!isset($data['account_id'])){
     exit;
 }
 
-$query = "SELECT payment_tbl.payment_id, payment_tbl.rent_id, payment_tbl.amount_paid, payment_tbl.date FROM payment_tbl JOIN rental_tbl ON payment_tbl.rent_id = rental_tbl.rent_id JOIN bike_tbl ON bike_tbl.bike_id = rental_tbl.bike_id WHERE bike_tbl.account_id = ? ORDER BY date DESC ";
+$query = "SELECT bike_tbl.bike_name, payment_tbl.payment_id, payment_tbl.rent_id, payment_tbl.amount_paid, payment_tbl.date FROM payment_tbl JOIN rental_tbl ON payment_tbl.rent_id = rental_tbl.rent_id JOIN bike_tbl ON bike_tbl.bike_id = rental_tbl.bike_id WHERE bike_tbl.account_id = ? ORDER BY date DESC ";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $data['account_id']);
 $stmt->execute();
