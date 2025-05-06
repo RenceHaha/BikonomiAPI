@@ -30,7 +30,7 @@ if(empty($payment_history)){
     echo json_encode(['success' => false, 'message' => 'No Data Found']);
     exit; 
 }
-echo json_encode(['success' => true, 'bike_locations' => $payment_history]);
+echo json_encode(['success' => true, 'payment_history' => $payment_history]);
 exit;
 
 ?>
