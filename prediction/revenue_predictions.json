@@ -273,56 +273,56 @@
     {
       "date": "2025-05-08",
       "predicted_revenue": 734.79,
-      "lower_bound": 500.88,
-      "upper_bound": 961.12
+      "lower_bound": 508.93,
+      "upper_bound": 960.55
     },
     {
       "date": "2025-05-09",
       "predicted_revenue": 859.24,
-      "lower_bound": 629.5,
-      "upper_bound": 1081.4
+      "lower_bound": 642.98,
+      "upper_bound": 1091.7
     },
     {
       "date": "2025-05-10",
       "predicted_revenue": 933.12,
-      "lower_bound": 705.16,
-      "upper_bound": 1169.96
+      "lower_bound": 705.04,
+      "upper_bound": 1159.93
     },
     {
       "date": "2025-05-11",
       "predicted_revenue": 579.32,
-      "lower_bound": 351.25,
-      "upper_bound": 810.18
+      "lower_bound": 369.9,
+      "upper_bound": 822.29
     },
     {
       "date": "2025-05-12",
       "predicted_revenue": 1041.68,
-      "lower_bound": 811.43,
-      "upper_bound": 1267.74
+      "lower_bound": 832.75,
+      "upper_bound": 1270.51
     },
     {
       "date": "2025-05-13",
       "predicted_revenue": 739.43,
-      "lower_bound": 513.72,
-      "upper_bound": 947.56
+      "lower_bound": 515.46,
+      "upper_bound": 972.16
     },
     {
       "date": "2025-05-14",
       "predicted_revenue": 584.05,
-      "lower_bound": 364.7,
-      "upper_bound": 820.42
+      "lower_bound": 342.12,
+      "upper_bound": 812.12
     },
     {
       "date": "2025-05-15",
       "predicted_revenue": 757.31,
-      "lower_bound": 521.22,
-      "upper_bound": 968.97
+      "lower_bound": 531.41,
+      "upper_bound": 971.51
     },
     {
       "date": "2025-05-16",
       "predicted_revenue": 881.76,
-      "lower_bound": 678.62,
-      "upper_bound": 1116.68
+      "lower_bound": 650.89,
+      "upper_bound": 1103.51
     }
   ]
 }
