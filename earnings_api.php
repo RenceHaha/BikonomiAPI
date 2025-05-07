@@ -109,7 +109,8 @@ function getRentalIncome($rentalId, $account_id) {
 
 // Function to get weekly earnings
 function getWeeklyEarnings($date, $account_id) {
-    global $conn;
+    try{
+        global $conn;
     
     // Get weekly earnings and organize by month
     $query = "SELECT 
@@ -176,6 +177,11 @@ function getWeeklyEarnings($date, $account_id) {
         'success' => true,
         'earnings' => $earnings
     ];
+    }catch(Exception $e){
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }finally{
+        $conn->close();
+    }
 }
 
 // Function to get monthly earnings
