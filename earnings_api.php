@@ -109,77 +109,77 @@ function getRentalIncome($rentalId, $account_id) {
 
 // Function to get weekly earnings
 function getWeeklyEarnings($date, $account_id) {
-    try{
+    try {
         global $conn;
     
-    // Get weekly earnings and organize by month
-    $query = "SELECT 
-                MONTH(p.date) as month,
-                YEAR(p.date) as year,
-                WEEKOFYEAR(p.date) as week_num,
-                MIN(DATE(p.date)) as week_start, 
-                MAX(DATE(p.date)) as week_end, 
-                SUM(p.amount_paid) as total 
-              FROM payment_tbl p 
-              JOIN rental_tbl r ON p.rent_id = r.rent_id 
-              JOIN bike_tbl b ON r.bike_id = b.bike_id
-              WHERE YEAR(p.date) = ? AND b.account_id = ? 
-              GROUP BY MONTH(p.date), WEEKOFYEAR(p.date) 
-              ORDER BY month ASC, week_num DESC";
+        // Get weekly earnings and organize by month
+        $query = "SELECT 
+                    MONTH(p.date) as month,
+                    YEAR(p.date) as year,
+                    WEEKOFYEAR(p.date) as week_num,
+                    MIN(DATE(p.date)) as week_start, 
+                    MAX(DATE(p.date)) as week_end, 
+                    SUM(p.amount_paid) as total 
+                  FROM payment_tbl p 
+                  JOIN rental_tbl r ON p.rent_id = r.rent_id 
+                  JOIN bike_tbl b ON r.bike_id = b.bike_id
+                  WHERE YEAR(p.date) = ? AND b.account_id = ? 
+                  GROUP BY MONTH(p.date), YEAR(p.date), WEEKOFYEAR(p.date) 
+                  ORDER BY month ASC, week_num DESC";
     
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("si", $date, $account_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("si", $date, $account_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
     
-    // Organize data by month
-    $monthlyData = [];
+        // Organize data by month
+        $monthlyData = [];
     
-    while ($row = $result->fetch_assoc()) {
-        $monthName = date('F', mktime(0, 0, 0, $row['month'], 1));
-        $year = $row['year'];
-        // Format date range as MM.DD - MM.DD
-        $weekStart = date('m.d', strtotime($row['week_start']));
-        $weekEnd = date('m.d', strtotime($row['week_end']));
-        $weekRange = $weekStart . ' - ' . $weekEnd;
-        
-        // Initialize month data if not set
-        if (!isset($monthlyData[$row['month']])) {
-            $monthlyData[$row['month']] = [
-                'month' => $monthName,
-                'year' => $year,
-                'amount' => 0,
-                'Range' => []
+        while ($row = $result->fetch_assoc()) {
+            $monthName = date('F', mktime(0, 0, 0, $row['month'], 1));
+            $year = $row['year'];
+            // Format date range as MM.DD - MM.DD
+            $weekStart = date('m.d', strtotime($row['week_start']));
+            $weekEnd = date('m.d', strtotime($row['week_end']));
+            $weekRange = $weekStart . ' - ' . $weekEnd;
+            
+            // Initialize month data if not set
+            if (!isset($monthlyData[$row['month']])) {
+                $monthlyData[$row['month']] = [
+                    'month' => $monthName,
+                    'year' => $year,
+                    'amount' => 0,
+                    'Range' => []
+                ];
+            }
+            
+            // Add weekly data and accumulate monthly total
+            $monthlyData[$row['month']]['amount'] += $row['total'];
+            $monthlyData[$row['month']]['Range'][] = [
+                'week' => $weekRange,
+                'amount' => $row['total']
             ];
         }
-        
-        // Add weekly data and accumulate monthly total
-        $monthlyData[$row['month']]['amount'] += $row['total'];
-        $monthlyData[$row['month']]['Range'][] = [
-            'week' => $weekRange,
-            'amount' => $row['total']
-        ];
-    }
     
-    // Convert to desired format
-    $earnings = [];
-    foreach ($monthlyData as $month) {
-        // Format amount with PHP currency format
-        $earnings[] = [
-            'Month' => $month['month'],
-            'Year' => $month['year'],
-            'amount' => $month['amount'],
-            'Range' => $month['Range']
-        ];
-    }
+        // Convert to desired format
+        $earnings = [];
+        foreach ($monthlyData as $month) {
+            // Format amount with PHP currency format
+            $earnings[] = [
+                'Month' => $month['month'],
+                'Year' => $month['year'],
+                'amount' => $month['amount'],
+                'Range' => $month['Range']
+            ];
+        }
     
-    return [
-        'success' => true,
-        'earnings' => $earnings
-    ];
-    }catch(Exception $e){
+        return [
+            'success' => true,
+            'earnings' => $earnings
+        ];
+    } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-    }finally{
+    } finally {
         $conn->close();
     }
 }
